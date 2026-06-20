@@ -1,0 +1,14 @@
+{
+  "name": "sustained",
+  "description": "Sustained load test - 50 TPS for 5 minutes, validates latency under steady traffic",
+  "users": 50,
+  "spawn_rate": 10,
+  "run_time": "5m",
+  "host": "http://localhost:8001",
+  "thresholds": {
+    "p95_response_time_ms": 200,
+    "p99_response_time_ms": 500,
+    "error_rate_percent": 0.5,
+    "avg_response_time_ms": 100
+  }
+}

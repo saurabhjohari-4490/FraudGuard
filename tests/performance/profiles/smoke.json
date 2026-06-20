@@ -1,0 +1,12 @@
+{
+  "name": "smoke",
+  "description": "Quick smoke test - validates API is responding under minimal load",
+  "users": 5,
+  "spawn_rate": 5,
+  "run_time": "30s",
+  "host": "http://localhost:8001",
+  "thresholds": {
+    "p95_response_time_ms": 500,
+    "error_rate_percent": 1.0
+  }
+}

@@ -1,0 +1,83 @@
+services:
+  fraud-api:
+    build: .
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://fraud:fraud_secret@postgres:5432/fraud_detection
+      - REDIS_URL=redis://redis:6379/0
+      - APP_ENV=development
+      - APP_LOG_LEVEL=info
+      - MOCK_ENABLED=true
+      - MOCK_TPS=10
+      - MOCK_FRAUD_RATE=0.05
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health').raise_for_status()"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: fraud_detection
+      POSTGRES_USER: fraud
+      POSTGRES_PASSWORD: fraud_secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fraud -d fraud_detection"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  mock-gen:
+    build: .
+    command: python -m fraud_detection.mock.runner
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://fraud:fraud_secret@postgres:5432/fraud_detection
+      - REDIS_URL=redis://redis:6379/0
+      - MOCK_TPS=10
+      - MOCK_FRAUD_RATE=0.05
+      - MOCK_SEED=42
+    depends_on:
+      fraud-api:
+        condition: service_healthy
+    profiles:
+      - mock
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: ../Dockerfile.dashboard
+      target: dev
+    ports:
+      - "3001:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8001
+    volumes:
+      - ./dashboard/src:/app/src
+    depends_on:
+      fraud-api:
+        condition: service_healthy
+
+volumes:
+  pgdata:

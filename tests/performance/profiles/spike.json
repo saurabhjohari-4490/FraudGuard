@@ -1,0 +1,13 @@
+{
+  "name": "spike",
+  "description": "Spike test - ramps to 200 users quickly, validates system recovery under burst",
+  "users": 200,
+  "spawn_rate": 50,
+  "run_time": "3m",
+  "host": "http://localhost:8001",
+  "thresholds": {
+    "p95_response_time_ms": 1000,
+    "p99_response_time_ms": 2000,
+    "error_rate_percent": 5.0
+  }
+}
