@@ -1,3 +1,5 @@
+name: fraudguard
+
 services:
   fraud-api:
     build: .

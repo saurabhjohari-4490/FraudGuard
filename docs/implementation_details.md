@@ -79,7 +79,7 @@
 ## Project Structure
 
 ```
-bee/
+fraudguard/
 ├── pyproject.toml                    # Python dependencies & tool config
 ├── Dockerfile                        # Backend container
 ├── Dockerfile.dashboard              # Frontend production build
@@ -495,11 +495,11 @@ TTL: 7200 seconds (2 hours)
 
 | Service | Image | Port | Purpose |
 |---------|-------|------|---------|
-| fraud-api | bee-fraud-api (custom) | 8001 → 8000 | FastAPI backend |
+| fraud-api | fraudguard-fraud-api (custom) | 8001 → 8000 | FastAPI backend |
 | postgres | postgres:16-alpine | 5433 → 5432 | Primary database |
 | redis | redis:7-alpine | 6380 → 6379 | Cache + velocity |
-| dashboard | bee-dashboard (custom) | 3001 → 5173 | React frontend (dev) |
-| mock-gen | bee-fraud-api (same image) | — | Traffic generator (profile: mock) |
+| dashboard | fraudguard-dashboard (custom) | 3001 → 5173 | React frontend (dev) |
+| mock-gen | fraudguard-fraud-api (same image) | — | Traffic generator (profile: mock) |
 
 ### Service Dependencies
 
@@ -734,7 +734,7 @@ Duplicate `transaction_id` in POST returns **409 Conflict** with existing decisi
 
 ```bash
 git clone <repo>
-cd bee
+cd fraudguard
 docker compose up -d                    # Start all services
 docker compose --profile mock up -d     # Start with mock traffic
 ```
